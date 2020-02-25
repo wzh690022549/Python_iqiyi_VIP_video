@@ -5,7 +5,7 @@ from urllib.request import urlopen
 
 
 root = tk.Tk()
-url = 'https://upload-images.jianshu.io/upload_images/5419313-a2f14480b957203c.png'
+url = 'https://pic0.iqiyipic.com/image/20180820/68/ec/a_100168808_m_601_m4_180_236.jpg'
 image_bytes = urlopen(url).read()
 data_stream = io.BytesIO(image_bytes)
 pil_image = Image.open(data_stream)
@@ -23,7 +23,7 @@ for i in range(10):
         row = row + 2
     label_img = tk.Label(root, image=tk_image).grid(row=row, column=column, columnspan=2)
     label_count = tk.Label(root, text=i).grid(row=row + 1, column=column)
-    btn_text = tk.Button(root, text=sf, command=new_window).grid(row=row + 1, column=column + 1)
+    btn_text = tk.Button(root, text=sf).grid(row=row + 1, column=column + 1)
     column = column + 2
 # label.pack(padx=5, pady=5)
 root.mainloop()

@@ -33,7 +33,7 @@ root.geometry('500x300')
 
 # name = input("搜索：")
 # url = "https://so.iqiyi.com/so/q_" + name
-play_url = "https://www.administratorw.com/video.php?url=http://www.iqiyi.com/v_19rur9poxc.html"
+play_url = "https://www.administratorw.com/video.php?url=http://www.iqiyi.com/v_19rqy2nbe0.html"
 # play(url)
 
 label_s_t = tk.Label(root, text="start time")

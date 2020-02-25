@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import threading as tk
+import threading
 
 
 def video_search_iqiyi(name):
@@ -23,14 +23,6 @@ def video_search_iqiyi(name):
                     li_list = ul.find_all('li')
                     for li in li_list:
                         video_list.append(li.a.attrs['href'])
-                # print(video_img)
-                # print(video_type)
-                # print(video_name)
-                # i = 1
-                # for video_url in video_list:
-                #     print("第" + str(i) + "集:" + video_url)
-                #     i = i + 1
-                # print()
                 video_inf.append([video_img, video_type, video_name, video_list])
             else:
                 continue
@@ -51,5 +43,5 @@ def video_search_iqiyi(name):
 
 if __name__ == "__main__":
     search_name = input("输入电影或电视剧：")
-    t_search = tk.Thread(target=video_search_iqiyi, args=(search_name,))
+    t_search = threading.Thread(target=video_search_iqiyi, args=(search_name,))
     t_search.start()
