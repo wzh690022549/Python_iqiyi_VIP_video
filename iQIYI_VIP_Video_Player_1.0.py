@@ -7,7 +7,7 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchWindowException, WebDriverException, InvalidSessionIdException
+from selenium.common.exceptions import NoSuchWindowException, WebDriverException, InvalidSessionIdException, TimeoutException
 import tkinter as tk
 import tkinter.font as tf
 from tkinter.messagebox import askyesno
@@ -72,6 +72,10 @@ class VideoPage(tk.Toplevel):
     def prepare_play(self, index, isnext, driver_index):
         print("播放第" + str(index + 1) + "集")
         if not isnext:
+            # option = webdriver.ChromeOptions()
+            # option.add_argument('disable-infobars')
+            # option.add_argument('-kiosk')
+            # driver = webdriver.Chrome(chrome_options=option)
             driver = webdriver.Chrome()
             self.driver_list.append(driver)
             self.__driver_index = self.__driver_index + 1
@@ -100,19 +104,28 @@ class VideoPage(tk.Toplevel):
         url = "https://www.administratorw.com/video.php?url=" + url
         self.driver_list[driver_index].get(url)
         iframe = self.find_tag_name("iframe", driver_index)
-        if not iframe:
+        if iframe == 'error':
+            return
+        if iframe == 'replay':
+            threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
             return
         self.driver_list[driver_index].switch_to.frame(iframe)
         iframe = self.find_tag_name("iframe", driver_index)
-        if not iframe:
+        if iframe == 'error':
+            return
+        if iframe == 'replay':
+            threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
             return
         self.driver_list[driver_index].switch_to.frame(iframe)
         iframe = self.find_tag_name("iframe", driver_index)
-        if not iframe:
+        if iframe == 'error':
+            return
+        if iframe == 'replay':
+            threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
             return
         self.driver_list[driver_index].switch_to.frame(iframe)
         start = self.find_xpath("//*[@id='a1']/div[4]/div[2]/button[1]", driver_index)
-        if not start:
+        if start == 'error':
             return
         print("开始播放")
         start.send_keys(Keys.SPACE)
@@ -125,7 +138,10 @@ class VideoPage(tk.Toplevel):
         while True:
             time.sleep(1)
             total_ = self.find_xpath("//*[@id='a1']/div[4]/div[2]/span/span[1]", driver_index)
-            if not total_:
+            if total_ == 'error':
+                return
+            if total_ == 'replay':
+                threading.Thread(target=self.end, args=(end_time, index, driver_index)).start()
                 return
             total = total_.get_attribute("innerHTML")
             if total != "00:00":
@@ -134,7 +150,10 @@ class VideoPage(tk.Toplevel):
         while True:
             time.sleep(2)
             current_ = self.find_xpath("//*[@id='a1']/div[4]/div[2]/span/span[2]", driver_index)
-            if not current_:
+            if current_ == 'error':
+                return
+            if current_ == 'replay':
+                threading.Thread(target=self.end, args=(end_time, index, driver_index)).start()
                 return
             current = current_.get_attribute("innerHTML")
             current_time = int(time.mktime(time.strptime("2020-01-01 00:" + current, "%Y-%m-%d %H:%M:%S")))
@@ -148,28 +167,28 @@ class VideoPage(tk.Toplevel):
             res = WebDriverWait(self.driver_list[driver_index], 30, 0.5).until(
                 EC.presence_of_element_located((By.XPATH, xpath)))
             return res
-        except NoSuchWindowException:
-            return False
-        except InvalidSessionIdException:
-            return False
+        except TimeoutException:
+            return 'replay'
         except WebDriverException:
-            return False
+            return 'error'
+        except NoSuchWindowException:
+            return 'error'
         except:
-            return self.find_xpath(xpath, driver_index)
+            return 'error'
 
     def find_tag_name(self, tag_name, driver_index):
         try:
             res = WebDriverWait(self.driver_list[driver_index], 30, 0.5).until(
                 EC.presence_of_element_located((By.TAG_NAME, tag_name)))
             return res
-        except NoSuchWindowException:
-            return False
-        except InvalidSessionIdException:
-            return False
+        except TimeoutException:
+            return 'replay'
         except WebDriverException:
-            return False
+            return 'error'
+        except NoSuchWindowException:
+            return 'error'
         except:
-            return self.find_tag_name(tag_name, driver_index)
+            return 'error'
 
     def closeWindow(self):
         ans = askyesno(title="提示", message="是否要关闭？")
