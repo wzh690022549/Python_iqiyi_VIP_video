@@ -12,7 +12,7 @@ def hit_me():
     var.set(e.get())
 
 
-b = tk.Button(window, text='hit me', font=('Arial', 12), width=10, height=1, command=hit_me)
+b = tk.Button(window, text='hit me', font=('Arial', 12), width=10, height=1, command=hit_me, cursor="hand2")
 b.pack()
 e = tk.Entry(window, show='*')
 e.pack()
