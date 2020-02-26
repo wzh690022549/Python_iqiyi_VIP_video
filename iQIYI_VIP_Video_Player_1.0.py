@@ -72,6 +72,7 @@ class VideoPage(tk.Toplevel):
     def prepare_play(self, index, isnext, driver_index):
         print("播放第" + str(index + 1) + "集")
         if not isnext:
+            
             # option = webdriver.ChromeOptions()
             # option.add_argument('disable-infobars')
             # option.add_argument('-kiosk')
