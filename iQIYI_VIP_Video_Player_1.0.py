@@ -23,7 +23,7 @@ def get_image(url):
     data_stream = io.BytesIO(image_bytes)
     pil_image = Image.open(data_stream)
     w, h = pil_image.size
-    pil_image = pil_image.resize((300, int(h / w * 300)), Image.ANTIALIAS)
+    pil_image = pil_image.resize((150, int(h / w * 150)), Image.ANTIALIAS)
     tk_image = ImageTk.PhotoImage(pil_image)
     return tk_image
 
@@ -45,8 +45,8 @@ class VideoPage(tk.Toplevel):
         self.row2.pack(fill="both")
         tk.Label(self.row1, image=tk_image).grid(row=0, column=0, rowspan=3)
         tk.Label(self.row1, text=self.info[1], font=tf.Font(size=10)).grid(row=0, column=1, sticky="ws")
-        tk.Label(self.row1, text=self.info[2], font=tf.Font(size=50)).grid(row=1, column=1, sticky="w")
-        tk.Button(self.row1, text="开始播放", font=tf.Font(size=30), cursor="hand2",
+        tk.Label(self.row1, text=self.info[2], font=tf.Font(size=30)).grid(row=1, column=1, sticky="w")
+        tk.Button(self.row1, text="开始播放", font=tf.Font(size=20), cursor="hand2",
                   command=lambda m=0: self.prepare_play(m, False, self.__driver_index)).grid(row=2, column=1,
                                                                                              sticky="wn", padx=10,
                                                                                              pady=10)
@@ -64,7 +64,7 @@ class VideoPage(tk.Toplevel):
                 column = 0
                 row = row + 1
             n = i
-            tk.Button(self.row2, text="第" + str(n + 1) + "集", cursor="hand2", font=tf.Font(size=20),
+            tk.Button(self.row2, text="第" + str(n + 1) + "集", cursor="hand2", font=tf.Font(size=15),
                       command=lambda m=n: self.prepare_play(m, False, self.__driver_index)).grid(row=row, column=column,
                                                                                                  padx=10, pady=10)
             column = column + 1
@@ -102,31 +102,21 @@ class VideoPage(tk.Toplevel):
             self.driver_list[driver_index].close()
 
     def play(self, url, start_time, driver_index):
-        url = "https://www.administratorw.com/video.php?url=" + url
-        self.driver_list[driver_index].get(url)
-        iframe = self.find_tag_name("iframe", driver_index)
-        if iframe == 'error':
-            return
-        if iframe == 'replay':
-            threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
-            return
-        self.driver_list[driver_index].switch_to.frame(iframe)
-        iframe = self.find_tag_name("iframe", driver_index)
-        if iframe == 'error':
-            return
-        if iframe == 'replay':
-            threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
-            return
-        self.driver_list[driver_index].switch_to.frame(iframe)
-        iframe = self.find_tag_name("iframe", driver_index)
-        if iframe == 'error':
-            return
-        if iframe == 'replay':
-            threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
-            return
-        self.driver_list[driver_index].switch_to.frame(iframe)
-        start = self.find_xpath("//*[@id='a1']/div[4]/div[2]/button[1]", driver_index)
+        play_url = "https://www.administratorw.com/video.php?url=" + url
+        self.driver_list[driver_index].get(play_url)
+        while True:
+            iframe = self.find_tag_name("iframe", driver_index)
+            if iframe == 'error':
+                break
+            if iframe == 'replay':
+                threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
+                return
+            self.driver_list[driver_index].switch_to.frame(iframe)
+        start = self.find_xpath("//*[@id='video']/div[4]/div[2]/button", driver_index)
         if start == 'error':
+            return
+        if start == 'replay':
+            threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
             return
         print("开始播放")
         start.send_keys(Keys.SPACE)
@@ -138,7 +128,7 @@ class VideoPage(tk.Toplevel):
     def end(self, end_time, index, driver_index):
         while True:
             time.sleep(1)
-            total_ = self.find_xpath("//*[@id='a1']/div[4]/div[2]/span/span[1]", driver_index)
+            total_ = self.find_xpath("//*[@id='video']/div[4]/div[2]/span/span[1]", driver_index)
             if total_ == 'error':
                 return
             if total_ == 'replay':
@@ -150,7 +140,7 @@ class VideoPage(tk.Toplevel):
         total_time = int(time.mktime(time.strptime("2020-01-01 00:" + total, "%Y-%m-%d %H:%M:%S")))
         while True:
             time.sleep(2)
-            current_ = self.find_xpath("//*[@id='a1']/div[4]/div[2]/span/span[2]", driver_index)
+            current_ = self.find_xpath("//*[@id='video']/div[4]/div[2]/span/span[2]", driver_index)
             if current_ == 'error':
                 return
             if current_ == 'replay':
@@ -179,15 +169,9 @@ class VideoPage(tk.Toplevel):
 
     def find_tag_name(self, tag_name, driver_index):
         try:
-            res = WebDriverWait(self.driver_list[driver_index], 30, 0.5).until(
+            res = WebDriverWait(self.driver_list[driver_index], 3, 0.5).until(
                 EC.presence_of_element_located((By.TAG_NAME, tag_name)))
             return res
-        except TimeoutException:
-            return 'replay'
-        except WebDriverException:
-            return 'error'
-        except NoSuchWindowException:
-            return 'error'
         except:
             return 'error'
 
@@ -274,22 +258,21 @@ class MainWindow(tk.Tk):
         video_inf = []
         try:
             for div in target:
-                video_site = div.contents[3].find('div', class_='result-bottom').div.div.span.em.get_text()
+                video_site = div.find('em', class_='player-name')
                 if '爱奇艺' in video_site:
-                    video_img = div.div.div.div.a.img.attrs['src']
-                    video_type = div.contents[3].h3.span.get_text()
-                    video_name = div.contents[3].h3.a.attrs['title']
+                    video_img = div.find('img').attrs['src']
+                    video_type = div.find('span', class_='item-type').get_text()
+                    video_name = div.find('a', class_='main-tit').attrs['title']
                     video_list = []
-                    ul_list = div.contents[3].find_all('ul', style="display:none;")
+                    ul_list = div.find_all('ul', style="display:none;")
                     for ul in ul_list:
                         li_list = ul.find_all('li')
                         for li in li_list:
-                            video_list.append(li.a.attrs['href'])
+                            video_list.append('https:' + li.a.attrs['href'])
                     video_inf.append([video_img, video_type, video_name, video_list])
-                else:
-                    continue
-        except:
-            print("查找完毕")
+        except Exception as error:
+            print(error)
+        print("查找完毕")
         print("结果如下：")
         for inf in video_inf:
             print(inf[0])
