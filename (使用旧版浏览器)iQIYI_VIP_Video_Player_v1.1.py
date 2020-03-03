@@ -189,7 +189,7 @@ class MainWindow(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("iQIYI_VIP_Video_Player_1.0")
+        self.title("iQIYI_VIP_Video_Player_v1.1")
         self.iconbitmap(".\\iQIYI.ico")
         self.resizable(0, 0)
         self.row1 = tk.Frame(self, bd=10)
