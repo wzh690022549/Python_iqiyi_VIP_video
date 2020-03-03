@@ -118,7 +118,7 @@ class VideoPage(tk.Toplevel):
             threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
             return
         print("开始播放")
-        start.send_keys(Keys.SPACE)
+        # start.send_keys(Keys.SPACE)
         print("快进" + str(int(start_time)) + "秒")
         for i in range(int(int(start_time) / 5)):
             time.sleep(0.1)
