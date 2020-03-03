@@ -7,7 +7,7 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchWindowException, WebDriverException, InvalidSessionIdException, TimeoutException
+from selenium.common.exceptions import NoSuchWindowException, WebDriverException, TimeoutException
 import tkinter as tk
 import tkinter.font as tf
 from tkinter.messagebox import askyesno
@@ -269,6 +269,8 @@ class MainWindow(tk.Tk):
                         li_list = ul.find_all('li')
                         for li in li_list:
                             video_list.append('https:' + li.a.attrs['href'])
+                    if len(video_list) == 0:
+                        video_list.append(div.find('a', class_='qy-search-result-btn').attrs['href'])
                     video_inf.append([video_img, video_type, video_name, video_list])
         except Exception as error:
             print(error)
