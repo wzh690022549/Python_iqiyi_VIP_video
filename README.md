@@ -20,4 +20,12 @@
             使用
         </h3>
     </li>
+    <li>
+        <h1>
+            <a href="https://github.com/wzh690022549/Python_iqiyi_VIP_video/releases">
+            Release V1.1
+            </a>
+        </h1>
+        <h2>已经修复无法查找到电影的问题</h2>
+    </li>
 </ul>

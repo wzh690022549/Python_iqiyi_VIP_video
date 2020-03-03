@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import threading
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 import time
 from selenium.webdriver.support.ui import WebDriverWait
@@ -72,12 +73,10 @@ class VideoPage(tk.Toplevel):
     def prepare_play(self, index, isnext, driver_index):
         print("播放第" + str(index + 1) + "集")
         if not isnext:
-            
-            # option = webdriver.ChromeOptions()
-            # option.add_argument('disable-infobars')
-            # option.add_argument('-kiosk')
-            # driver = webdriver.Chrome(chrome_options=option)
-            driver = webdriver.Chrome()
+            options = Options()
+            options.binary_location = "Application/360chrome.exe"
+            options.add_argument('disable-infobars')
+            driver = webdriver.Chrome(executable_path="chromedriver.exe", options=options)
             self.driver_list.append(driver)
             self.__driver_index = self.__driver_index + 1
 
@@ -270,7 +269,7 @@ class MainWindow(tk.Tk):
                         for li in li_list:
                             video_list.append('https:' + li.a.attrs['href'])
                     if len(video_list) == 0:
-                        video_list.append(div.find('a', class_='qy-search-result-btn').attrs['href'])
+                        video_list.append('https:' + div.find('a', class_='qy-search-result-btn').attrs['href'])
                     video_inf.append([video_img, video_type, video_name, video_list])
         except Exception as error:
             print(error)

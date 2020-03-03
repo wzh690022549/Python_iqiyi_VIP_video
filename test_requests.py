@@ -22,9 +22,9 @@ def video_search_iqiyi(name):
                 for ul in ul_list:
                     li_list = ul.find_all('li')
                     for li in li_list:
-                        video_list.append(li.a.attrs['href'])
+                        video_list.append('https:' + li.a.attrs['href'])
                 if len(video_list) == 0:
-                    video_list.append(div.find('a', class_='qy-search-result-btn').attrs['href'])
+                    video_list.append('https:' + div.find('a', class_='qy-search-result-btn').attrs['href'])
                 video_inf.append([video_img, video_type, video_name, video_list])
     except Exception as error:
         print(error)
