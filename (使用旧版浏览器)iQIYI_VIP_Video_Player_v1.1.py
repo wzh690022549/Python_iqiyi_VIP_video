@@ -8,7 +8,9 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchWindowException, WebDriverException, TimeoutException
+from selenium.common.exceptions import NoSuchWindowException, WebDriverException, TimeoutException, \
+    StaleElementReferenceException
+from selenium.webdriver import ActionChains
 import tkinter as tk
 import tkinter.font as tf
 from tkinter.messagebox import askyesno
@@ -110,7 +112,10 @@ class VideoPage(tk.Toplevel):
             if iframe == 'replay':
                 threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
                 return
-            self.driver_list[driver_index].switch_to.frame(iframe)
+            try:
+                self.driver_list[driver_index].switch_to.frame(iframe)
+            except:
+                continue
         start = self.find_xpath("//*[@id='video']/div[4]/div[2]/button", driver_index)
         if start == 'error':
             return
@@ -118,11 +123,11 @@ class VideoPage(tk.Toplevel):
             threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
             return
         print("开始播放")
-        # start.send_keys(Keys.SPACE)
+        ActionChains(self.driver_list[driver_index]).move_to_element(start).click().click().perform()
         print("快进" + str(int(start_time)) + "秒")
         for i in range(int(int(start_time) / 5)):
             time.sleep(0.1)
-            start.send_keys(Keys.ARROW_RIGHT)
+            ActionChains(self.driver_list[driver_index]).send_keys(Keys.ARROW_RIGHT).perform()
 
     def end(self, end_time, index, driver_index):
         while True:
@@ -158,6 +163,8 @@ class VideoPage(tk.Toplevel):
                 EC.presence_of_element_located((By.XPATH, xpath)))
             return res
         except TimeoutException:
+            return 'replay'
+        except StaleElementReferenceException:
             return 'replay'
         except WebDriverException:
             return 'error'
