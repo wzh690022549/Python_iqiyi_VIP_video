@@ -122,12 +122,13 @@ class VideoPage(tk.Toplevel):
         if start == 'replay':
             threading.Thread(target=self.play, args=(url, start_time, driver_index)).start()
             return
-        print("开始播放")
-        ActionChains(self.driver_list[driver_index]).move_to_element(start).click().click().perform()
+        ActionChains(self.driver_list[driver_index]).move_to_element(start).click().perform()
         print("快进" + str(int(start_time)) + "秒")
         for i in range(int(int(start_time) / 5)):
             time.sleep(0.1)
             ActionChains(self.driver_list[driver_index]).send_keys(Keys.ARROW_RIGHT).perform()
+        print("开始播放")
+        ActionChains(self.driver_list[driver_index]).move_to_element(start).click().perform()
 
     def end(self, end_time, index, driver_index):
         while True:
